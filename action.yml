@@ -11,4 +11,4 @@ inputs:
     default: ".env.staging"
 runs:
   using: "docker"
-  image: "docker/Dockerfile"
+  image: "Dockerfile"
