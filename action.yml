@@ -1,0 +1,14 @@
+name: "Android Build Machine"
+description: "Android workflow to build and deploy android apps"
+inputs:
+  track:
+    description: "Seleted track to deploy [Alpha - Production]"
+    required: false
+    default: "alpha"
+  env:
+    description: "Specify the environment file to use for the build and deployment"
+    required: false
+    default: ".env.staging"
+runs:
+  using: "docker"
+  image: "docker/Dockerfile"
