@@ -1,4 +1,11 @@
-FROM alpine:lastest
+FROM debian:stable-slim
+
+RUN dpkg -S /bin/ls
+COPY . .
+
+CMD ls -la
+
+# FROM alpine:lastest
 
 # ENV ANDROID_HOME=/opt/android
 # ENV GRADLE_USER_HOME=/opt/gradle
@@ -38,6 +45,6 @@ FROM alpine:lastest
 #     "platforms;android-${ANDROID_VERSION}" \
 #     "build-tools;${BUILD_TOOLS}"
 
-COPY . .
+# COPY . .
 
-RUN ls
+# RUN ls
