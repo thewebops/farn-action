@@ -1,2 +1,4 @@
-# android-workflow
-Github action workflow to build and deploy react native android apps.
+# farn-action
+
+FARN (Fastlane Android React Native) action to build your android app (APK/ AAB).
+
