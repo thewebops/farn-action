@@ -1,50 +1,44 @@
-FROM debian:stable-slim
+FROM openjdk:8-jdk-slim-buster
 
-RUN dpkg -S /bin/ls
-COPY . .
+ENV ANDROID_HOME=/opt/android
+ENV GRADLE_USER_HOME=/opt/gradle
+ENV ANDROID_VERSION=29
+ENV BUILD_TOOLS=29.0.2
+ENV ANDROID_SDK_URL=https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+ENV PATH $PATH:$ANDROID_HOME/tools
+ENV PATH $PATH:$ANDROID_HOME/platform-tools
+ENV PATH $PATH:$ANDROID_HOME/build-tools/${BUILD_TOOLS}
 
-CMD ls -la
+RUN apt-get update && \
+    apt-get install -y gnupg build-essential curl software-properties-common apt-transport-https
 
-# FROM alpine:lastest
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-# ENV ANDROID_HOME=/opt/android
-# ENV GRADLE_USER_HOME=/opt/gradle
-# ENV WEBOPS_KEYSTORE_DIRECTORY=/app/android/app
-# ENV ANDROID_VERSION=28
-# ENV BUILD_TOOLS=28.0.3
-# ENV ANDROID_SDK_URL=https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
-# ENV PATH $PATH:$ANDROID_HOME/tools
-# ENV PATH $PATH:$ANDROID_HOME/platform-tools
-# ENV PATH $PATH:$ANDROID_HOME/build-tools/${BUILD_TOOLS}
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash 
 
-# RUN apt-get update && \
-#     apt-get install -y gnupg build-essential curl software-properties-common apt-transport-https
+RUN apt update && \
+    apt-get -y install nodejs unzip yarn ruby-full
 
-# RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-#     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# RUN curl -sL https://deb.nodesource.com/setup_12.x | bash 
+RUN gem install fastlane -NV
 
-# RUN apt update && \
-#     apt-get -y install nodejs unzip yarn ruby-full
+RUN mkdir -p $ANDROID_HOME
 
-# RUN rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN cd $ANDROID_HOME && \
+    curl -L $ANDROID_SDK_URL -o android-sdk-tools.zip && \
+    unzip -q android-sdk-tools.zip && \ 
+    rm -f android-sdk-tools.zip
 
-# RUN gem install fastlane -NV
+RUN yes | ${ANDROID_HOME}/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} --licenses && \
+    yes | ${ANDROID_HOME}/tools/bin/sdkmanager --sdk_root=${ANDROID_HOME} --verbose \
+    "platforms;android-${ANDROID_VERSION}" \
+    "build-tools;${BUILD_TOOLS}"
 
-# RUN mkdir -p $ANDROID_HOME
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# RUN cd $ANDROID_HOME && \
-#     curl -L $ANDROID_SDK_URL -o android-sdk-tools.zip && \
-#     unzip -q android-sdk-tools.zip && \ 
-#     rm -f android-sdk-tools.zip
+RUN ls -la
 
-# RUN yes | ${ANDROID_HOME}/tools/bin/sdkmanager --licenses && \
-#     yes | ${ANDROID_HOME}/tools/bin/sdkmanager --verbose \
-#     'platform-tools' \
-#     "platforms;android-${ANDROID_VERSION}" \
-#     "build-tools;${BUILD_TOOLS}"
-
-# COPY . .
-
-# RUN ls
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,14 +1,19 @@
 name: "Android Build Machine"
 description: "Android workflow to build and deploy android apps"
 inputs:
-  track:
-    description: "Seleted track to deploy [Alpha - Production]"
-    required: false
-    default: "alpha"
   env:
     description: "Specify the environment file to use for the build and deployment"
     required: false
     default: ".env.staging"
+  keystore:
+    description: "Base64 encoding of your app signing key"
+    required: false
+  keystore_password:
+    description: "Your keystore password"
+    required: false
+  keystore_alias:
+    description: "Your keystore alias"
+    required: false
 runs:
   using: "docker"
   image: "Dockerfile"
